@@ -1,1 +1,66 @@
-BRBPresentation/obj/*
+# Binários e objetos do .NET
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug/
+**/[Rr]elease/
+
+# Arquivos gerados pela compilação
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Pasta de uploads
+BRBPresentation/wwwroot/uploads/
+
+# Pasta de pacotes
+**/[Pp]ackages/
+*.nupkg
+
+# Pasta de publicação
+publish/
+
+# Arquivos de configuração do Visual Studio Code
+.vscode/
+
+# Arquivos de configuração do Visual Studio
+.vs/
+*.opendb
+*.sdf
+*.cachefile
+*.dbmdl
+
+# Pasta de cache do NuGet
+.nuget/
+
+# Arquivos de log
+*.log
+*.log.*
+
+# Arquivos temporários
+*.tmp
+*.tmp_proj
+*.cache
+*.bak
+*.swp
+*.swp.*
+*~.nib
+
+# Arquivos de configuração locais
+appsettings.Development.json
+
+# Arquivos de banco de dados SQL Server
+*.mdf
+*.ldf
+
+# Arquivos de backup
+Backup*/
+
+# Arquivos de configuração do Rider
+.idea/
+
+# Arquivos de configuração do Resharper
+_ReSharper*/
+
+# Arquivos de cobertura de código
+*.coveragexml
