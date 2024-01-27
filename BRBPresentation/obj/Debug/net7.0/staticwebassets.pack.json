@@ -253,14 +253,6 @@
       "PackagePath": "staticwebassets/uploads/.DS_Store"
     },
     {
-      "Id": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/uploads/012024__25955944869.pdf",
-      "PackagePath": "staticwebassets/uploads/012024__25955944869.pdf"
-    },
-    {
-      "Id": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/uploads/brbCard.ofx",
-      "PackagePath": "staticwebassets/uploads/brbCard.ofx"
-    },
-    {
       "Id": "obj/Debug/net7.0/staticwebassets/msbuild.BRBPresentation.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

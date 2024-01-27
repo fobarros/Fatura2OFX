@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "o9HiNeOrAWUJCu7hBy92zUUlsyAMaPSNgP6PfdgN/jo=",
+  "Hash": "C+8i8Xn+RNyGgSrMonNCmxQ9HVUu0WUwIiK5MnU9ADo=",
   "Source": "BRBPresentation",
   "BasePath": "_content/BRBPresentation",
   "Mode": "Default",
@@ -1103,40 +1103,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/.DS_Store"
-    },
-    {
-      "Identity": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/uploads/012024__25955944869.pdf",
-      "SourceId": "BRBPresentation",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/",
-      "BasePath": "_content/BRBPresentation",
-      "RelativePath": "uploads/012024__25955944869.pdf",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/012024__25955944869.pdf"
-    },
-    {
-      "Identity": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/uploads/brbCard.ofx",
-      "SourceId": "BRBPresentation",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/fobarros/Dev/brbcardfatura/BRBPresentation/wwwroot/",
-      "BasePath": "_content/BRBPresentation",
-      "RelativePath": "uploads/brbCard.ofx",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/brbCard.ofx"
     }
   ]
 }
