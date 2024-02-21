@@ -33,7 +33,8 @@ namespace Core
         private string GenerateFITID(DateTime datePosted, string name)
         {
             var datePart = datePosted.ToString("yyyyMMdd");
-            var namePart = name.Replace(" ", "").Replace("&", "");
+            var namePart = name.Replace(" ", "").Replace("&", "").Replace(",", ".")
+                        .Replace("$", "");
             string result = datePart + namePart;
             return result.Length > 30 ? result[..30] : result;
         }

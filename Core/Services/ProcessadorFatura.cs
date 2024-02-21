@@ -6,10 +6,12 @@ namespace Core
     public class ProcessadorFatura
     {
         private readonly IExclusaoFaturaService _exclusaoFaturaService;
+        private readonly DateTime _dataInicioFatura;
 
-        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService)
+        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, DateTime dataInicioFatura)
         {
             _exclusaoFaturaService = exclusaoFaturaService;
+            _dataInicioFatura = dataInicioFatura;
         }
 
         private List<Fatura> LimpaFaturadeOutros(List<Fatura> faturas)
@@ -107,6 +109,10 @@ namespace Core
                     var indiceData = dataMatch.Index;
                     var dataString = dataMatch.Value;
                     var data = DateTime.ParseExact(dataString, "dd/MM", CultureInfo.InvariantCulture);
+                    if (data < _dataInicioFatura)
+                    {
+                        data = _dataInicioFatura;
+                    }
 
                     // Encontrar o índice do próximo valor monetário após a data
                     var valorRegex = new Regex(@"R\$ \d{1,3}(?:\.\d{3})*,\d{2}[\+\-]");

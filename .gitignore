@@ -64,3 +64,21 @@ _ReSharper*/
 
 # Arquivos de cobertura de código
 *.coveragexml
+BRBPresentation/obj/Debug/net7.0/BRBPresentation.csproj.AssemblyReference.cache
+BRBPresentation/obj/Debug/net7.0/project.razor.vscode.bin
+BRBPresentation/obj/Debug/net7.0/BRBPresentation.csproj.AssemblyReference.cache
+BRBPresentation/obj/Debug/net7.0/project.razor.vscode.bin
+BRBPresentation/wwwroot/uploads/.DS_Store
+Core/bin/Debug/net7.0/Core.dll
+Core/bin/Debug/net7.0/Core.pdb
+Core/obj/Debug/net7.0/Core.dll
+Core/obj/Debug/net7.0/Core.pdb
+Core/obj/Debug/net7.0/ref/Core.dll
+Core/obj/Debug/net7.0/refint/Core.dll
+Infrastructure/bin/Debug/net7.0/Core.dll
+Infrastructure/bin/Debug/net7.0/Core.pdb
+Infrastructure/bin/Debug/net7.0/Infrastructure.dll
+Infrastructure/bin/Debug/net7.0/Infrastructure.pdb
+Infrastructure/obj/Debug/net7.0/Infrastructure.csproj.AssemblyReference.cache
+Infrastructure/obj/Debug/net7.0/Infrastructure.dll
+Infrastructure/obj/Debug/net7.0/Infrastructure.pdb

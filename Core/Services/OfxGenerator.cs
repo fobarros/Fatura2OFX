@@ -51,7 +51,7 @@ namespace Core{
             sb.AppendLine("                <BANKTRANLIST>");
             sb.AppendLine($"                       <DTSTART>{dtStart.ToString("yyyyMMddHHmmss")}</DTSTART>");
             sb.AppendLine($"                       <DTEND>{dtEnd.ToString("yyyyMMddHHmmss")}</DTEND>");
-            foreach (var fatura in faturas)
+            foreach (var fatura in faturas.OrderBy(fatura => fatura.DTPOSTED).ToList())
             {
                 sb.AppendLine("                    <STMTTRN>");
                 sb.AppendLine($"                        <TRNTYPE>{fatura.TRNTYPE}</TRNTYPE>");
