@@ -109,10 +109,13 @@ namespace Core
                     var indiceData = dataMatch.Index;
                     var dataString = dataMatch.Value;
                     var data = DateTime.ParseExact(dataString, "dd/MM", CultureInfo.InvariantCulture);
-                    if (data < _dataInicioFatura)
-                    {
+
+                    //Se o mes da data (ex: 10) for maior q da fatura + 1 mes (ex: 19/01 fica mes 02)
+                    if(data.Month > _dataInicioFatura.AddMonths(1).Month)
                         data = _dataInicioFatura;
-                    }
+                    //Se mesmo mes. Se dia da fatura (ex: 19) > dia lido.
+                    else if(data.Month == _dataInicioFatura.Month &&  _dataInicioFatura.Day > data.Day)
+                        data = _dataInicioFatura;
 
                     // Encontrar o índice do próximo valor monetário após a data
                     var valorRegex = new Regex(@"R\$ \d{1,3}(?:\.\d{3})*,\d{2}[\+\-]");
