@@ -6,18 +6,20 @@ namespace Core
     {
         public string TRNTYPE { get; set; }
         public string DTPOSTED { get; set; }
+        public string DTPOSTED_ORIGINAL { get; set; }
         public string TRNAMT { get; set; }
         public string FITID { get; set; }
         public string NAME { get; set; }
         public decimal AMOUNT_VALUE { get; set; }
         public DateTime DATA { get; set; }
 
-        public Fatura(string trnType, decimal amount, string name, DateTime datePosted)
+        public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal)
         {
             TRNTYPE = trnType;
             NAME = name;
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
+            DTPOSTED_ORIGINAL = dataOriginal;
 
             // Formatar a data
             DTPOSTED = datePosted.ToString("yyyyMMddHHmmss");

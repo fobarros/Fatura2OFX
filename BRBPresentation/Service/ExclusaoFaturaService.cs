@@ -4,16 +4,16 @@ namespace BRBPresentation.Services
 {
     public class ExclusaoFaturaService : IExclusaoFaturaService
     {
-        private readonly List<ExclusaoFaturaConfig> _exclusoesFatura;
+        private readonly ExclusoesFaturaConfig _exclusoesFatura;
 
         public ExclusaoFaturaService(IConfiguration configuration)
         {
             _exclusoesFatura = configuration
                 .GetSection("ExclusoesFatura")
-                .Get<List<ExclusaoFaturaConfig>>() ?? new List<ExclusaoFaturaConfig>();
+                .Get<ExclusoesFaturaConfig>() ?? new ExclusoesFaturaConfig();
         }
 
-        public List<ExclusaoFaturaConfig> ObterExclusoesFatura()
+        public ExclusoesFaturaConfig ObterExclusoesFatura()
         {
             return _exclusoesFatura;
         }
