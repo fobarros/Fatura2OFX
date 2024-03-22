@@ -98,3 +98,5 @@ Infrastructure/bin/Debug/net7.0/Infrastructure.pdb
 Infrastructure/obj/Debug/net7.0/Infrastructure.csproj.AssemblyReference.cache
 Infrastructure/obj/Debug/net7.0/Infrastructure.dll
 Infrastructure/obj/Debug/net7.0/Infrastructure.pdb
+Core/bin/Debug/net7.0/Core.dll
+Core/bin/Debug/net7.0/Core.pdb

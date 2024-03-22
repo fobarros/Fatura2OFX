@@ -136,6 +136,9 @@ namespace Core
                     //Se mesmo mes. Se dia da fatura (ex: 19) > dia lido.
                     else if(data.Month == _dataInicioFatura.Month &&  _dataInicioFatura.Day > data.Day)
                         data = _dataInicioFatura;
+                    //Meses anteriores assumem data da fatura
+                    else if(data.Month <= _dataInicioFatura.Month)
+                        data = _dataInicioFatura;
 
                     // Encontrar o índice do próximo valor monetário após a data
                     var valorRegex = new Regex(@"R\$ \d{1,3}(?:\.\d{3})*,\d{2}[\+\-]");
