@@ -1,5 +1,11 @@
 using System.Globalization;
 
+var cultureInfo = new CultureInfo("pt-BR");
+cultureInfo.DateTimeFormat.Calendar = new GregorianCalendar();
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Parse DataInicioFatura from appsettings.json
