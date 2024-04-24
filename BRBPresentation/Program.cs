@@ -8,6 +8,10 @@ CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Adiciona logging ao console
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // Parse DataInicioFatura from appsettings.json
 var dataInicioConfig = builder.Configuration["DataInicioFatura"];
 DateTime dataInicioFatura;

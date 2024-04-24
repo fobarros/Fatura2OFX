@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure;
+using System.Diagnostics;
 
 public class PdfController : Controller
 {
@@ -43,7 +44,7 @@ public class PdfController : Controller
             var maiorData = faturas.Max(fatura => fatura.DATA);
             decimal totalFatura = faturas.Sum(fatura => fatura.AMOUNT_VALUE);
 
-            Console.WriteLine($"Total Fatura: {totalFatura}");
+            Debug.WriteLine($"Total Fatura: {totalFatura}");
 
             //Gera o OFX baseado nas faturas
             var ofxGenerator = new Core.OfxGenerator();

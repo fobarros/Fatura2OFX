@@ -16,7 +16,8 @@ namespace Core
         public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal)
         {
             TRNTYPE = trnType;
-            NAME = name;
+            NAME = name.Replace(",", ".").Replace("$", "");
+            NAME = NAME.Length > 30 ? NAME[..30] : NAME;
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
             DTPOSTED_ORIGINAL = dataOriginal;

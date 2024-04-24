@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Core
@@ -15,25 +16,28 @@ namespace Core
         }
 
         private List<Fatura> LimpaFaturadeOutros(List<Fatura> faturas)
-        {    
+        {
             var exclusoes = _exclusaoFaturaService.ObterExclusoesFatura();
+            var novaFatura  = new List<Fatura>();
 
-            for (int i = 0; i < faturas.Count; i++){
+            for (int i = 0; i < faturas.Count; i++)
+            {
+                var faturaWasRemoved = false;
                 //exclusao individual
                 foreach (var individual in exclusoes.Individuais)
                 {
-                    if(faturas[i].NAME.Contains(individual.Label) 
-                        && faturas[i].AMOUNT_VALUE == individual.Valor
-                        && faturas[i].DTPOSTED_ORIGINAL == individual.Data)
-                        {
-                            Console.WriteLine($"Unit Removed: {faturas[i].NAME}, vl: {individual.Valor}, data: {individual.Data}");
-                            faturas.RemoveAt(i);
-                            if(i>0)
-                                i--;
-                            break;
-                        }
+                    if (faturas[i].NAME.Contains(individual.Label) && faturas[i].AMOUNT_VALUE == individual.Valor && faturas[i].DTPOSTED_ORIGINAL == individual.Data)
+                    {
+                        Debug.WriteLine($"Unit Removed: {faturas[i].NAME}, vl: {individual.Valor}, data: {individual.Data}");
+                        faturaWasRemoved = true;
+                        break;
+                    }
                 }
+                if (!faturaWasRemoved)
+                    novaFatura.Add(faturas[i]);
             }
+
+            faturas = new List<Fatura>(novaFatura);
 
             // Aplicar a lógica de exclusão baseada em labels
             foreach (var exclusao in exclusoes.Lote)
@@ -43,7 +47,7 @@ namespace Core
                     //exclusao em lote
                     if (faturas[i].NAME.Contains(exclusao.LabelInicial))
                     {
-                        Console.WriteLine($"Bulk Removed: {faturas[i].NAME}");
+                        Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}");
                         // Remover a fatura atual (com LabelInicial)
                         faturas.RemoveAt(i);
 
@@ -56,7 +60,7 @@ namespace Core
                         {
                             if (removerProxima)
                             {
-                                Console.WriteLine($"Bulk Removed: {faturas[i].NAME}");
+                                Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}");
                                 faturas.RemoveAt(i);
                             }
                             else
@@ -69,7 +73,7 @@ namespace Core
                         // Remover a fatura com LabelFinal e sair do loop interno
                         if (i < faturas.Count)
                         {
-                            Console.WriteLine($"Bulk Removed: {faturas[i].NAME}. Terminou looping");
+                            Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}. Terminou looping");
                             faturas.RemoveAt(i);
                         }
                         break;
@@ -109,7 +113,7 @@ namespace Core
             var linhaRegex = Regex.IsMatch(linha, @"\b\d{2}/\d{2}\b.*\bR\$ \d{1,3}(?:\.\d{3})*(?:,\d{2})?\b[\+\-]?");
 
             //if (linhaRegex)
-                //Console.WriteLine($"Linha: '{linha}' é {(linhaRegex ? "válida" : "inválida")}");
+            //Debug.WriteLine($"Linha: '{linha}' é {(linhaRegex ? "válida" : "inválida")}");
 
             return linhaRegex;
         }
@@ -131,13 +135,13 @@ namespace Core
                     var data = DateTime.ParseExact(dataString, "dd/MM", CultureInfo.InvariantCulture);
 
                     //Se o mes da data (ex: 10) for maior q da fatura + 1 mes (ex: 19/01 fica mes 02)
-                    if(data.Month > _dataInicioFatura.AddMonths(1).Month)
+                    if (data.Month > _dataInicioFatura.AddMonths(1).Month)
                         data = _dataInicioFatura;
                     //Se mesmo mes. Se dia da fatura (ex: 19) > dia lido.
-                    else if(data.Month == _dataInicioFatura.Month &&  _dataInicioFatura.Day > data.Day)
+                    else if (data.Month == _dataInicioFatura.Month && _dataInicioFatura.Day > data.Day)
                         data = _dataInicioFatura;
                     //Meses anteriores assumem data da fatura
-                    else if(data.Month <= _dataInicioFatura.Month)
+                    else if (data.Month <= _dataInicioFatura.Month)
                         data = _dataInicioFatura;
 
                     // Encontrar o índice do próximo valor monetário após a data
@@ -157,12 +161,12 @@ namespace Core
                     var fatura = new Fatura(trnType, valor, descricao, data, dataString);
                     faturas.Add(fatura);
 
-                    Console.WriteLine($"Fatura processada: Data: {data.ToShortDateString()}, Tipo: {trnType}, Valor: {valor}, Descrição: {descricao}");
+                    Debug.WriteLine($"Fatura processada: Data: {data.ToShortDateString()}, Tipo: {trnType}, Valor: {valor}, Descrição: {descricao}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao processar a linha '{linha}': {ex.Message} - linha do código: {ex.StackTrace}");
+                Debug.WriteLine($"Erro ao processar a linha '{linha}': {ex.Message} - linha do código: {ex.StackTrace}");
             }
 
             return faturas;
