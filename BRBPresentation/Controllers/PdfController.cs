@@ -42,9 +42,24 @@ public class PdfController : Controller
 
             var menorData = faturas.Min(fatura => fatura.DATA);
             var maiorData = faturas.Max(fatura => fatura.DATA);
+
+            // Calcular o total das faturas
             decimal totalFatura = faturas.Sum(fatura => fatura.AMOUNT_VALUE);
 
+            // Calcular o total de créditos (valores positivos)
+            decimal totalFaturaCredito = faturas.Where(fatura => fatura.AMOUNT_VALUE > 0).Sum(fatura => fatura.AMOUNT_VALUE);
+
+            // Calcular o total de débitos (valores negativos)
+            decimal totalFaturaDebito = faturas.Where(fatura => fatura.AMOUNT_VALUE < 0).Sum(fatura => fatura.AMOUNT_VALUE);
+
             Debug.WriteLine($"Total Fatura: {totalFatura}");
+            Debug.WriteLine($"Total Fatura Crédito: {totalFaturaCredito}");
+            Debug.WriteLine($"Total Fatura Débito: {totalFaturaDebito}");
+
+            // Armazenando valores para exibição
+            ViewBag.TotalFatura = totalFatura;
+            ViewBag.TotalFaturaCredito = totalFaturaCredito;
+            ViewBag.TotalFaturaDebito = totalFaturaDebito;
 
             //Gera o OFX baseado nas faturas
             var ofxGenerator = new Core.OfxGenerator();
