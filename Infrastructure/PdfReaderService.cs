@@ -14,10 +14,12 @@ namespace Infrastructure
             _processadorFatura = processadorFatura;
         }
 
-        public List<Fatura> ProcessarFaturasDoPdf(string caminhoPdf)
+        public (List<Fatura>, string) ProcessarFaturasDoPdf(string caminhoPdf)
         {
             string textoExtraido = ExtrairTextoDoPdf(caminhoPdf);
-            return _processadorFatura.ProcessarTextoPdf(textoExtraido);
+            var (faturas, log) = _processadorFatura.ProcessarTextoPdf(textoExtraido);
+            Console.WriteLine(log); // ou use o log conforme necessário
+            return (faturas, log);
         }
 
         private string ExtrairTextoDoPdf(string caminhoPdf)

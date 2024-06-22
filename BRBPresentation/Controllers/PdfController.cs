@@ -38,7 +38,7 @@ public class PdfController : Controller
             }
 
             //realiza o processo de gerar faturas para cada linha do PDF
-            var faturas = _pdfReaderService.ProcessarFaturasDoPdf(path);
+            var (faturas, log) = _pdfReaderService.ProcessarFaturasDoPdf(path);
 
             var menorData = faturas.Min(fatura => fatura.DATA);
             var maiorData = faturas.Max(fatura => fatura.DATA);
@@ -60,6 +60,7 @@ public class PdfController : Controller
             ViewBag.TotalFatura = totalFatura;
             ViewBag.TotalFaturaCredito = totalFaturaCredito;
             ViewBag.TotalFaturaDebito = totalFaturaDebito;
+            ViewBag.log = log;
 
             //Gera o OFX baseado nas faturas
             var ofxGenerator = new Core.OfxGenerator();

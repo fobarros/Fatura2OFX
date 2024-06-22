@@ -3,11 +3,15 @@
 }
 
 <h2>Resultados do Upload</h2>
-
 <div>
     <p>Total das Faturas: @ViewBag.TotalFatura</p>
     <p>Total Crédito: @ViewBag.TotalFaturaCredito</p>
     <p>Total Débito: @ViewBag.TotalFaturaDebito</p>
+</div>
+
+<h3>Log do Processamento</h3>
+<div>
+    <pre>@ViewBag.Log</pre>
 </div>
 
 <a href="@Url.Action("DownloadOfx", "Pdf")">Download do OFX</a>

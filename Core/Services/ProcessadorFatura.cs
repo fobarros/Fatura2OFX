@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Core
@@ -15,10 +16,11 @@ namespace Core
             _dataInicioFatura = dataInicioFatura;
         }
 
-        private List<Fatura> LimpaFaturadeOutros(List<Fatura> faturas)
+        private (List<Fatura>, string) LimpaFaturadeOutros(List<Fatura> faturas)
         {
             var exclusoes = _exclusaoFaturaService.ObterExclusoesFatura();
             var novaFatura  = new List<Fatura>();
+            var log = new StringBuilder();
 
             for (int i = 0; i < faturas.Count; i++)
             {
@@ -28,7 +30,7 @@ namespace Core
                 {
                     if (faturas[i].NAME.Contains(individual.Label) && faturas[i].AMOUNT_VALUE == individual.Valor && faturas[i].DTPOSTED_ORIGINAL == individual.Data)
                     {
-                        Debug.WriteLine($"Unit Removed: {faturas[i].NAME}, vl: {individual.Valor}, data: {individual.Data}");
+                        log.AppendLine($"Unit Removed: {faturas[i].NAME}, vl: {individual.Valor}, data: {individual.Data}");
                         faturaWasRemoved = true;
                         break;
                     }
@@ -47,7 +49,7 @@ namespace Core
                     //exclusao em lote
                     if (faturas[i].NAME.Contains(exclusao.LabelInicial))
                     {
-                        Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}");
+                        log.AppendLine($"Bulk Removed: {faturas[i].NAME}");
                         // Remover a fatura atual (com LabelInicial)
                         faturas.RemoveAt(i);
 
@@ -60,7 +62,7 @@ namespace Core
                         {
                             if (removerProxima)
                             {
-                                Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}");
+                                log.AppendLine($"Bulk Removed: {faturas[i].NAME}");
                                 faturas.RemoveAt(i);
                             }
                             else
@@ -73,7 +75,7 @@ namespace Core
                         // Remover a fatura com LabelFinal e sair do loop interno
                         if (i < faturas.Count)
                         {
-                            Debug.WriteLine($"Bulk Removed: {faturas[i].NAME}. Terminou looping");
+                            log.AppendLine($"Bulk Removed: {faturas[i].NAME}. Terminou looping");
                             faturas.RemoveAt(i);
                         }
                         break;
@@ -81,13 +83,14 @@ namespace Core
                 }
             }
 
-            return faturas;
+            return (faturas, log.ToString());
         }
 
-        public List<Fatura> ProcessarTextoPdf(string texto)
+        public (List<Fatura>, string) ProcessarTextoPdf(string texto)
         {
             var faturas = new List<Fatura>();
             var linhas = texto.Split('\n'); // Divide o texto em linhas
+            var log = new StringBuilder();
 
             foreach (var linha in linhas)
             {
@@ -98,9 +101,10 @@ namespace Core
                 }
             }
 
-            var _faturas = LimpaFaturadeOutros(faturas);
+            var (_faturas, limpezaLog) = LimpaFaturadeOutros(faturas);
+            log.Append(limpezaLog);
 
-            return _faturas;
+            return (_faturas, log.ToString());
         }
 
         private bool LinhaValidaParaFatura(string linha)
