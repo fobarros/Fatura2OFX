@@ -20,6 +20,13 @@ if (!DateTime.TryParseExact(dataInicioConfig, "dd/MM/yyyy", CultureInfo.Invarian
     throw new InvalidOperationException("DataInicioFatura no appsettings.json está em um formato inválido ou ausente.");
 }
 
+var pulaLinhaConfig = builder.Configuration["PulaLinha"];
+bool pulaLinha;
+if (!bool.TryParse(pulaLinhaConfig, out pulaLinha))
+{
+    throw new InvalidOperationException("PulaLinha no appsettings.json está em um formato inválido ou ausente.");
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -28,7 +35,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<Core.ProcessadorFatura>(provider =>
     new Core.ProcessadorFatura(
         provider.GetRequiredService<Core.IExclusaoFaturaService>(),
-        dataInicioFatura));
+        dataInicioFatura,
+        pulaLinha));
 
 builder.Services.AddScoped<Infrastructure.PdfReaderService>(); 
 builder.Services.AddSingleton<Core.IExclusaoFaturaService, BRBPresentation.Services.ExclusaoFaturaService>();

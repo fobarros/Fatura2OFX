@@ -9,11 +9,13 @@ namespace Core
     {
         private readonly IExclusaoFaturaService _exclusaoFaturaService;
         private readonly DateTime _dataInicioFatura;
+        private readonly Boolean _pulaLinha;
 
-        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, DateTime dataInicioFatura)
+        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, DateTime dataInicioFatura, Boolean pulaLinha)
         {
             _exclusaoFaturaService = exclusaoFaturaService;
             _dataInicioFatura = dataInicioFatura;
+            _pulaLinha = pulaLinha;
         }
 
         private (List<Fatura>, string) LimpaFaturadeOutros(List<Fatura> faturas)
@@ -54,7 +56,8 @@ namespace Core
                         faturas.RemoveAt(i);
 
                         // Pular a próxima fatura (manter uma, remover a seguinte)
-                        i++;
+                        if(_pulaLinha)
+                            i++;
 
                         // Continuar removendo até encontrar LabelFinal
                         bool removerProxima = true;
@@ -65,7 +68,7 @@ namespace Core
                                 log.AppendLine($"Bulk Removed: {faturas[i].NAME}");
                                 faturas.RemoveAt(i);
                             }
-                            else
+                            else if(_pulaLinha)
                             {
                                 i++;
                             }
