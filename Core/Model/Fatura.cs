@@ -16,30 +16,38 @@ namespace Core
         public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal)
         {
             TRNTYPE = trnType;
-            NAME = name.Replace(",", ".").Replace("$", "");
-            NAME = NAME.Length > 30 ? NAME[..30] : NAME;
+            NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "");
+            NAME = string.IsNullOrWhiteSpace(NAME) ? "Anuidade" : (NAME.Length > 30 ? NAME[..30] : NAME);
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
             DTPOSTED_ORIGINAL = dataOriginal;
 
             // Formatar a data
-            DTPOSTED = datePosted.ToString("yyyyMMddHHmmss");
+            DTPOSTED = datePosted.ToString("yyyyMMdd05mmss");
 
             // Calcular e formatar o valor
             var signedAmount = trnType == "DEBIT" ? -amount : amount;
             TRNAMT = signedAmount.ToString("F2", CultureInfo.InvariantCulture);
 
             // Gerar FITID
-            FITID = GenerateFITID(datePosted, name);
+            FITID = GenerateFITID(datePosted, name, amount);
         }
 
-        private string GenerateFITID(DateTime datePosted, string name)
+        private string GenerateFITID(DateTime datePosted, string name, decimal valor)
         {
+            // Concatenar os valores de entrada em uma string
             var datePart = datePosted.ToString("yyyyMMdd");
             var namePart = name.Replace(" ", "").Replace("&", "").Replace(",", ".")
-                        .Replace("$", "");
-            string result = datePart + namePart;
-            return result.Length > 30 ? result[..30] : result;
+                               .Replace("$", "");
+            var combinedInput = $"{datePart}{namePart}{valor}";
+
+            // Gerar um hash determinístico dos parâmetros de entrada
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                var hash = md5.ComputeHash(System.Text.Encoding.UTF8.GetBytes(combinedInput));
+                return new Guid(hash).ToString();
+            }
         }
+
     }
 }
