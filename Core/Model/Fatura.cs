@@ -13,8 +13,9 @@ namespace Core
         public decimal AMOUNT_VALUE { get; set; }
         public DateTime DATA { get; set; }
         public string Usuario { get; set; }
+        public string CartaoCredito { get; set; }
 
-        public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal, string usuario = "Fernando")
+        public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal, string usuario = "FERNANDO O BARROS", string cartaoCredito = "")
         {
             TRNTYPE = trnType;
             NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "");
@@ -23,6 +24,7 @@ namespace Core
             DATA = datePosted;
             DTPOSTED_ORIGINAL = dataOriginal;
             Usuario = usuario;
+            CartaoCredito = cartaoCredito;
 
             // Formatar a data
             DTPOSTED = datePosted.ToString("yyyyMMdd05mmss");

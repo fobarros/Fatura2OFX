@@ -43,7 +43,7 @@ public class PdfController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upload(IFormFile file, TipoSaida tipoSaida)
+    public IActionResult Upload(IFormFile file, TipoSaida tipoSaida, bool debugMode = false)
     {
         var nomeArquivoSaida = String.Empty;
         if (file != null && file.Length > 0)
@@ -73,7 +73,12 @@ public class PdfController : Controller
             ViewBag.TotalFatura = totalFatura;
             ViewBag.TotalFaturaCredito = totalFaturaCredito;
             ViewBag.TotalFaturaDebito = totalFaturaDebito;
-            ViewBag.log = log;
+            
+            // Só passa o log para a view se estiver no modo debug e o tipo de saída for Tela
+            if (tipoSaida == TipoSaida.Tela && debugMode)
+            {
+                ViewBag.log = log;
+            }
 
             if (tipoSaida == TipoSaida.OFX)
             {

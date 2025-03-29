@@ -1,19 +1,73 @@
 @model BRBPresentation.Models.ReportViewModel
 
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-md-9">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
+<style>
+    .gradient-info {
+        background: linear-gradient(90deg, rgba(13,202,240,0.9) 0%, rgba(13,202,240,0.1) 100%) !important;
+    }
+    .gradient-primary {
+        background: linear-gradient(90deg, rgba(13,110,253,0.9) 0%, rgba(13,110,253,0.1) 100%) !important;
+    }
+    .gradient-warning {
+        background: linear-gradient(90deg, rgba(255,193,7,0.9) 0%, rgba(255,193,7,0.1) 100%) !important;
+    }
+    .gradient-success {
+        background: linear-gradient(90deg, rgba(25,135,84,0.9) 0%, rgba(25,135,84,0.1) 100%) !important;
+    }
+    
+    .table thead th {
+        background-color: rgba(0,0,0,0.03);
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .table-light-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .table-light-striped tbody tr:nth-of-type(even) {
+        background-color: #ffffff;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    @if (!string.IsNullOrEmpty(ViewBag.log))
+    {
+        <div class="row mb-2 mx-0">
+            <div class="col-12">
+                <div class="card shadow-sm rounded">
+                    <div class="card-header gradient-info text-dark py-2 rounded-top">
+                        <h4 class="mb-0">Logs do Processamento</h4>
+                    </div>
+                    <div class="card-body p-2">
+                        <pre class="mb-0" style="max-height: 200px; overflow-y: auto;">@ViewBag.log</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    
+    <div class="row mx-0">
+        <div class="col-md-9 pe-1 ps-0">
+            <div class="card shadow-sm rounded">
+                <div class="card-header gradient-primary text-white py-2 rounded-top">
                     <h4 class="mb-0">Relatório de Faturas</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-1">
                     <div class="table-responsive">
-                        <table class="table table-striped mb-0">
+                        <table class="table table-light-striped table-hover table-sm mb-0">
                             <thead>
                                 <tr>
                                     <th>Data</th>
                                     <th>Descrição</th>
+                                    <th>Cartão</th>
                                     <th>Usuário</th>
                                     <th class="text-right">Total</th>
                                 </tr>
@@ -24,10 +78,11 @@
                                     <tr>
                                         <td>@fatura.DTPOSTED_ORIGINAL</td>
                                         <td>@fatura.NAME</td>
+                                        <td>@(fatura.CartaoCredito.Length > 4 ? fatura.CartaoCredito.Substring(fatura.CartaoCredito.Length - 4) : fatura.CartaoCredito)</td>
                                         <td>
                                             <select class="form-control form-control-sm usuario-select" data-valor="@fatura.AMOUNT_VALUE">
-                                                <option value="Fernando">Fernando</option>
-                                                <option value="Roberta">Roberta</option>
+                                                <option value="FERNANDO O BARROS" selected="@(fatura.Usuario == "FERNANDO O BARROS")">Fernando</option>
+                                                <option value="ROBERTA BARROS" selected="@(fatura.Usuario == "ROBERTA BARROS")">Roberta</option>
                                             </select>
                                         </td>
                                         <td class="text-right">@fatura.AMOUNT_VALUE.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
@@ -36,15 +91,15 @@
                             </tbody>
                             <tfoot>
                                 <tr class="table-info">
-                                    <td colspan="3" class="text-right"><strong>Total Créditos:</strong></td>
+                                    <td colspan="4" class="text-right"><strong>Total Créditos:</strong></td>
                                     <td class="text-right">@Model.TotalFaturaCredito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
                                 </tr>
                                 <tr class="table-info">
-                                    <td colspan="3" class="text-right"><strong>Total Débitos:</strong></td>
+                                    <td colspan="4" class="text-right"><strong>Total Débitos:</strong></td>
                                     <td class="text-right">@Model.TotalFaturaDebito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
                                 </tr>
                                 <tr class="table-primary">
-                                    <td colspan="3" class="text-right"><strong>Total Geral:</strong></td>
+                                    <td colspan="4" class="text-right"><strong>Total Geral:</strong></td>
                                     <td class="text-right"><strong>@Model.TotalFatura.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></td>
                                 </tr>
                             </tfoot>
@@ -53,24 +108,75 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card sticky-top" style="top: 20px;">
-                <div class="card-header bg-success text-white">
+        <div class="col-md-3 ps-1 pe-0">
+            <div class="card shadow-sm rounded mb-1">
+                <div class="card-header gradient-warning text-dark py-2 rounded-top">
+                    <h4 class="mb-0">Totais por Cartão</h4>
+                </div>
+                <div class="card-body p-1">
+                    <div class="table-responsive">
+                        <table class="table table-light-striped table-hover table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Cartão</th>
+                                    <th>Usuário</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var totaisPorCartao = Model.Faturas
+                                        .GroupBy(f => new { f.CartaoCredito, f.Usuario })
+                                        .Select(g => new {
+                                            Cartao = g.Key.CartaoCredito,
+                                            Usuario = g.Key.Usuario.Split(' ')[0].Substring(0, 1) + g.Key.Usuario.Split(' ')[0].Substring(1).ToLower(),
+                                            Total = g.Sum(f => f.AMOUNT_VALUE)
+                                        })
+                                        .OrderBy(x => x.Cartao)
+                                        .ThenBy(x => x.Usuario);
+                                    
+                                    var totalGeral = totaisPorCartao.Sum(x => x.Total);
+                                }
+                                @foreach (var total in totaisPorCartao)
+                                {
+                                    <tr>
+                                        <td>@(total.Cartao.Length > 4 ? total.Cartao.Substring(total.Cartao.Length - 4) : total.Cartao)</td>
+                                        <td>@total.Usuario</td>
+                                        <td class="text-right">@total.Total.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                                    </tr>
+                                }
+                                <tr class="table-warning">
+                                    <td colspan="2" class="text-right"><strong>Total Geral:</strong></td>
+                                    <td class="text-right"><strong>@totalGeral.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-sm rounded sticky-top" style="top: 5px;">
+                <div class="card-header gradient-success text-dark py-2 rounded-top">
                     <h4 class="mb-0">Totais por Usuário</h4>
                 </div>
-                <div class="card-body">
-                    <table class="table table-sm mb-0">
-                        <tbody>
-                            <tr>
-                                <td><strong>Fernando:</strong></td>
-                                <td class="text-right" id="total-fernando">R$ 0,00</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Roberta:</strong></td>
-                                <td class="text-right" id="total-roberta">R$ 0,00</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-body p-1">
+                    <div class="table-responsive">
+                        <table class="table table-light-striped table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50%;">Fernando:</td>
+                                    <td class="text-right" id="total-fernando">R$ 0,00</td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 50%;">Roberta:</td>
+                                    <td class="text-right" id="total-roberta">R$ 0,00</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td><strong>Total Geral:</strong></td>
+                                    <td class="text-right" id="total-geral"><strong>R$ 0,00</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -85,30 +191,27 @@
                 let totalRoberta = 0;
 
                 $('.usuario-select').each(function() {
-                    // Converte a vírgula para ponto antes de fazer o parseFloat
                     const valorStr = $(this).data('valor').toString().replace(',', '.');
                     const valor = Math.round(parseFloat(valorStr) * 100);
                     const usuario = $(this).val();
 
-                    if (usuario === 'Fernando') {
+                    if (usuario === 'FERNANDO O BARROS') {
                         totalFernando += valor;
-                    } else if (usuario === 'Roberta') {
+                    } else if (usuario === 'ROBERTA BARROS') {
                         totalRoberta += valor;
                     }
                 });
 
-                // Divide por 100 para voltar ao valor original com decimais
                 totalFernando = totalFernando / 100;
                 totalRoberta = totalRoberta / 100;
+                const totalGeral = totalFernando + totalRoberta;
 
                 $('#total-fernando').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalFernando));
                 $('#total-roberta').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRoberta));
+                $('#total-geral').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGeral));
             }
 
-            // Atualiza os totais quando a página carrega
             atualizarTotais();
-
-            // Atualiza os totais quando um usuário é alterado
             $('.usuario-select').on('change', atualizarTotais);
         });
     </script>

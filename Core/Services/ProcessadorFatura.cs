@@ -10,6 +10,8 @@ namespace Core
         private readonly IExclusaoFaturaService _exclusaoFaturaService;
         private readonly DateTime _dataInicioFatura;
         private readonly Boolean _pulaLinha;
+        private string _usuarioAtual = "";
+        private string _cartaoAtual = "";
 
         public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, DateTime dataInicioFatura, Boolean pulaLinha)
         {
@@ -95,14 +97,76 @@ namespace Core
             var linhas = texto.Split('\n'); // Divide o texto em linhas
             var log = new StringBuilder();
 
+            //log.AppendLine($"Linha: {texto}");
+            log.AppendLine("=== Início do Processamento ===");
+            log.AppendLine($"Total de linhas para processar: {linhas.Length}");
+
             foreach (var linha in linhas)
             {
+                // Primeiro tenta identificar o cartão
+                log.AppendLine($"Linha: {linha}");
+                var cartaoMatch = Regex.Match(linha, @"\d{4}\.\*{4}\.\*{4}\.\d{4}");
+                if (cartaoMatch.Success)
+                {
+                    _cartaoAtual = cartaoMatch.Value;
+                    log.AppendLine($"Cartão identificado: {_cartaoAtual}");
+                    log.AppendLine($"Linha completa do cartão: {linha}");
+
+                    // Se encontrou cartão, procura pelo usuário na mesma linha
+                    if (linha.Contains("FERNANDO O BARROS"))
+                    {
+                        _usuarioAtual = "FERNANDO O BARROS";
+                        log.AppendLine($"Usuário identificado: {_usuarioAtual}");
+                    }
+                    else if (linha.Contains("ROBERTA BARROS"))
+                    {
+                        _usuarioAtual = "ROBERTA BARROS";
+                        log.AppendLine($"Usuário identificado: {_usuarioAtual}");
+                    }
+                    else
+                    {
+                        log.AppendLine("Aviso: Cartão encontrado mas usuário não identificado na linha");
+                    }
+                    
+                    continue;
+                }
+
+                // Se não tem usuário definido ainda, tenta identificar
+                if (string.IsNullOrEmpty(_usuarioAtual))
+                {
+                    if (linha.Contains("FERNANDO O BARROS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _usuarioAtual = "FERNANDO O BARROS";
+                        log.AppendLine($"Usuário identificado em linha separada: {_usuarioAtual}");
+                        log.AppendLine($"Linha completa do usuário: {linha}");
+                    }
+                    else if (linha.Contains("ROBERTA BARROS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _usuarioAtual = "ROBERTA BARROS";
+                        log.AppendLine($"Usuário identificado em linha separada: {_usuarioAtual}");
+                        log.AppendLine($"Linha completa do usuário: {linha}");
+                    }
+                }
+
                 if (LinhaValidaParaFatura(linha))
                 {
+                    log.AppendLine($"Processando linha de fatura: {linha}");
                     var faturasExtraidas = ExtrairFaturaDaLinha(linha);
-                    faturas.AddRange(faturasExtraidas);  // Adiciona todas as faturas da lista
+                    faturas.AddRange(faturasExtraidas);
                 }
             }
+
+            // Se não encontrou usuário, define o padrão
+            if (string.IsNullOrEmpty(_usuarioAtual))
+            {
+                _usuarioAtual = "FERNANDO O BARROS";
+                log.AppendLine("Usuário não identificado, usando padrão: FERNANDO O BARROS");
+            }
+
+            log.AppendLine($"=== Fim do Processamento ===");
+            log.AppendLine($"Total de faturas processadas: {faturas.Count}");
+            log.AppendLine($"Usuário final: {_usuarioAtual}");
+            log.AppendLine($"Cartão final: {_cartaoAtual}");
 
             var (_faturas, limpezaLog) = LimpaFaturadeOutros(faturas);
             log.Append(limpezaLog);
@@ -165,10 +229,10 @@ namespace Core
                     var valor = decimal.Parse(valorLimpo, CultureInfo.InvariantCulture);
                     var trnType = valorString.EndsWith("+") ? "DEBIT" : "CREDIT";
 
-                    var fatura = new Fatura(trnType, valor, descricao, data, dataString);
+                    var fatura = new Fatura(trnType, valor, descricao, data, dataString, _usuarioAtual, _cartaoAtual);
                     faturas.Add(fatura);
 
-                    Debug.WriteLine($"Fatura processada: Data: {data.ToShortDateString()}, Tipo: {trnType}, Valor: {valor}, Descrição: {descricao}");
+                    Debug.WriteLine($"Fatura processada: Data: {data.ToShortDateString()}, Tipo: {trnType}, Valor: {valor}, Descrição: {descricao}, Usuário: {_usuarioAtual}, Cartão: {_cartaoAtual}");
                 }
             }
             catch (Exception ex)

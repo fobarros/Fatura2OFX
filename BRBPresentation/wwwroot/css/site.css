@@ -28,8 +28,7 @@ body {
 .table {
   margin-bottom: 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  width: calc(100% - 0.5rem);
-  margin: 0.25rem;
+  width: 100%;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -39,11 +38,11 @@ body {
   color: white;
   font-weight: 600;
   border-bottom: none;
-  padding: 12px 15px;
+  padding: 10px 15px;
 }
 
 .table tbody td {
-  padding: 12px 15px;
+  padding: 8px 15px;
   vertical-align: middle;
 }
 
@@ -51,15 +50,22 @@ body {
   background-color: rgba(0,0,0,0.02);
 }
 
+/* Estilos para cards */
 .card {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   border: none;
   border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .card-header {
   border-bottom: none;
-  padding: 15px 20px;
+  padding: 12px 15px;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .card-header.bg-primary {
@@ -70,13 +76,56 @@ body {
   background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
 }
 
-.form-control.usuario-select {
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  padding: 6px 12px;
+.card-header.bg-warning {
+  background: linear-gradient(135deg, #f39c12, #f1c40f) !important;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.table-responsive {
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Ajustes de layout específicos */
+.col-md-9 .card {
+  margin-right: 1rem;
+}
+
+.col-md-3 .card {
+  margin-left: 1rem;
+}
+
+/* Ajuste para a tabela de totais */
+.card .table-sm {
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+}
+
+.table-sm td {
+  padding: 6px 10px;
+}
+
+/* Estilos para valores monetários */
+.text-right {
+  font-family: 'Roboto Mono', monospace;
   font-size: 14px;
 }
 
+/* Ajustes para o select de usuário */
+.form-control.usuario-select {
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  font-size: 13px;
+  height: auto;
+}
+
+/* Estilos para rodapé da tabela */
 .table-info {
   background-color: #f8f9fa !important;
 }
@@ -87,32 +136,5 @@ body {
 
 tfoot tr td {
   font-weight: 600;
-  padding: 12px 15px !important;
-}
-
-/* Estilos para valores monetários */
-.text-right {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 14px;
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-.card-body.p-0 {
-    padding: 1.25rem;
-}
-
-.table-responsive {
-    margin: 0.5rem 1.25rem;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Ajuste para a tabela de totais por usuário */
-.card .table-sm {
-    width: 100%;
-    margin: 0;
-    box-shadow: none;
+  padding: 10px 15px !important;
 }
