@@ -1,0 +1,63 @@
+@model BRBPresentation.Models.ReportViewModel
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Relatório de Faturas</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Usuário</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var fatura in Model.Faturas)
+                        {
+                            <tr>
+                                <td>@fatura.TRNTYPE</td>
+                                <td>@fatura.DTPOSTED_ORIGINAL</td>
+                                <td>@fatura.NAME</td>
+                                <td>
+                                    <select class="form-control">
+                                        <option value="Fernando" selected>Fernando</option>
+                                        <option value="Roberta">Roberta</option>
+                                    </select>
+                                </td>
+                                <td class="text-right">@fatura.AMOUNT_VALUE.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-info">
+                            <td colspan="4" class="text-right"><strong>Total Créditos:</strong></td>
+                            <td class="text-right">@Model.TotalFaturaCredito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                        </tr>
+                        <tr class="table-info">
+                            <td colspan="4" class="text-right"><strong>Total Débitos:</strong></td>
+                            <td class="text-right">@Model.TotalFaturaDebito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td colspan="4" class="text-right"><strong>Total Geral:</strong></td>
+                            <td class="text-right"><strong>@Model.TotalFatura.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Removido o código anterior pois não é mais necessário
+        });
+    </script>
+} 

@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Infrastructure;
 using System.Diagnostics;
 using System.Text;
+using BRBPresentation.Models;
 
 public enum TipoSaida
 {
     OFX,
-    GoogleSpreadsheet
+    GoogleSpreadsheet,
+    Tela
 }
 
 public class PdfController : Controller
@@ -80,8 +82,9 @@ public class PdfController : Controller
                 nomeArquivoSaida = "brbCard.ofx";
                 var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoSaida);
                 System.IO.File.WriteAllText(caminhoArquivoSaida, conteudoOfx);
+                return View("DownloadOfx", nomeArquivoSaida);
             }
-            else
+            else if (tipoSaida == TipoSaida.GoogleSpreadsheet)
             {
                 var csvBuilder = new StringBuilder();
                 // Cabeçalho do CSV
@@ -96,9 +99,21 @@ public class PdfController : Controller
                 nomeArquivoSaida = "brbCard.csv";
                 var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoSaida);
                 System.IO.File.WriteAllText(caminhoArquivoSaida, csvBuilder.ToString());
+                return View("DownloadGoogleSpreadsheet", nomeArquivoSaida);
+            }
+            else // Tela
+            {
+                var viewModel = new ReportViewModel
+                {
+                    Faturas = faturas,
+                    TotalFatura = totalFatura,
+                    TotalFaturaCredito = totalFaturaCredito,
+                    TotalFaturaDebito = totalFaturaDebito
+                };
+                return View("Report", viewModel);
             }
         }
 
-        return tipoSaida == TipoSaida.OFX ? View("DownloadOfx", nomeArquivoSaida) : View("DownloadGoogleSpreadsheet", nomeArquivoSaida);
+        return View("Index");
     }
 }

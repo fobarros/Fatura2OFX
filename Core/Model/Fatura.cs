@@ -12,8 +12,9 @@ namespace Core
         public string NAME { get; set; }
         public decimal AMOUNT_VALUE { get; set; }
         public DateTime DATA { get; set; }
+        public string Usuario { get; set; }
 
-        public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal)
+        public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal, string usuario = "Fernando")
         {
             TRNTYPE = trnType;
             NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "");
@@ -21,6 +22,7 @@ namespace Core
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
             DTPOSTED_ORIGINAL = dataOriginal;
+            Usuario = usuario;
 
             // Formatar a data
             DTPOSTED = datePosted.ToString("yyyyMMdd05mmss");
@@ -41,13 +43,12 @@ namespace Core
                                .Replace("$", "");
             var combinedInput = $"{datePart}{namePart}{valor}";
 
-            // Gerar um hash determinÌstico dos par‚metros de entrada
+            // Gerar um hash determin√≠stico dos par√¢metros de entrada
             using (var md5 = System.Security.Cryptography.MD5.Create())
             {
                 var hash = md5.ComputeHash(System.Text.Encoding.UTF8.GetBytes(combinedInput));
                 return new Guid(hash).ToString();
             }
         }
-
     }
 }
