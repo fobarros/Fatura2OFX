@@ -19,4 +19,100 @@ html {
 
 body {
   margin-bottom: 60px;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Estilos para tabelas */
+.table {
+  margin-bottom: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  width: calc(100% - 0.5rem);
+  margin: 0.25rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: 600;
+  border-bottom: none;
+  padding: 12px 15px;
+}
+
+.table tbody td {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0,0,0,0.02);
+}
+
+.card {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border: none;
+  border-radius: 10px;
+}
+
+.card-header {
+  border-bottom: none;
+  padding: 15px 20px;
+}
+
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #2980b9, #3498db) !important;
+}
+
+.card-header.bg-success {
+  background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+}
+
+.form-control.usuario-select {
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.table-info {
+  background-color: #f8f9fa !important;
+}
+
+.table-primary {
+  background-color: #e3f2fd !important;
+}
+
+tfoot tr td {
+  font-weight: 600;
+  padding: 12px 15px !important;
+}
+
+/* Estilos para valores monetários */
+.text-right {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-body.p-0 {
+    padding: 1.25rem;
+}
+
+.table-responsive {
+    margin: 0.5rem 1.25rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Ajuste para a tabela de totais por usuário */
+.card .table-sm {
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
 }

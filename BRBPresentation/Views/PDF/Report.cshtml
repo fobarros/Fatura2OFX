@@ -1,54 +1,77 @@
 @model BRBPresentation.Models.ReportViewModel
 
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Relatório de Faturas</h4>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Relatório de Faturas</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Usuário</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var fatura in Model.Faturas)
+                                {
+                                    <tr>
+                                        <td>@fatura.DTPOSTED_ORIGINAL</td>
+                                        <td>@fatura.NAME</td>
+                                        <td>
+                                            <select class="form-control form-control-sm usuario-select" data-valor="@fatura.AMOUNT_VALUE">
+                                                <option value="Fernando">Fernando</option>
+                                                <option value="Roberta">Roberta</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-right">@fatura.AMOUNT_VALUE.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-info">
+                                    <td colspan="3" class="text-right"><strong>Total Créditos:</strong></td>
+                                    <td class="text-right">@Model.TotalFaturaCredito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                                </tr>
+                                <tr class="table-info">
+                                    <td colspan="3" class="text-right"><strong>Total Débitos:</strong></td>
+                                    <td class="text-right">@Model.TotalFaturaDebito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td colspan="3" class="text-right"><strong>Total Geral:</strong></td>
+                                    <td class="text-right"><strong>@Model.TotalFatura.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Tipo</th>
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Usuário</th>
-                            <th class="text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var fatura in Model.Faturas)
-                        {
+        <div class="col-md-3">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Totais por Usuário</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
                             <tr>
-                                <td>@fatura.TRNTYPE</td>
-                                <td>@fatura.DTPOSTED_ORIGINAL</td>
-                                <td>@fatura.NAME</td>
-                                <td>
-                                    <select class="form-control">
-                                        <option value="Fernando" selected>Fernando</option>
-                                        <option value="Roberta">Roberta</option>
-                                    </select>
-                                </td>
-                                <td class="text-right">@fatura.AMOUNT_VALUE.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                                <td><strong>Fernando:</strong></td>
+                                <td class="text-right" id="total-fernando">R$ 0,00</td>
                             </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr class="table-info">
-                            <td colspan="4" class="text-right"><strong>Total Créditos:</strong></td>
-                            <td class="text-right">@Model.TotalFaturaCredito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
-                        </tr>
-                        <tr class="table-info">
-                            <td colspan="4" class="text-right"><strong>Total Débitos:</strong></td>
-                            <td class="text-right">@Model.TotalFaturaDebito.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
-                        </tr>
-                        <tr class="table-primary">
-                            <td colspan="4" class="text-right"><strong>Total Geral:</strong></td>
-                            <td class="text-right"><strong>@Model.TotalFatura.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
+                            <tr>
+                                <td><strong>Roberta:</strong></td>
+                                <td class="text-right" id="total-roberta">R$ 0,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -57,7 +80,36 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Removido o código anterior pois não é mais necessário
+            function atualizarTotais() {
+                let totalFernando = 0;
+                let totalRoberta = 0;
+
+                $('.usuario-select').each(function() {
+                    // Converte a vírgula para ponto antes de fazer o parseFloat
+                    const valorStr = $(this).data('valor').toString().replace(',', '.');
+                    const valor = Math.round(parseFloat(valorStr) * 100);
+                    const usuario = $(this).val();
+
+                    if (usuario === 'Fernando') {
+                        totalFernando += valor;
+                    } else if (usuario === 'Roberta') {
+                        totalRoberta += valor;
+                    }
+                });
+
+                // Divide por 100 para voltar ao valor original com decimais
+                totalFernando = totalFernando / 100;
+                totalRoberta = totalRoberta / 100;
+
+                $('#total-fernando').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalFernando));
+                $('#total-roberta').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRoberta));
+            }
+
+            // Atualiza os totais quando a página carrega
+            atualizarTotais();
+
+            // Atualiza os totais quando um usuário é alterado
+            $('.usuario-select').on('change', atualizarTotais);
         });
     </script>
 } 
