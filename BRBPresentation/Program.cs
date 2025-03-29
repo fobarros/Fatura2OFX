@@ -30,6 +30,13 @@ if (!bool.TryParse(pulaLinhaConfig, out pulaLinha))
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Configurar limites do Kestrel
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestHeadersTotalSize = 1024 * 1024; // 1MB
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
+});
 
 // Configure ProcessadorFatura to include DataInicioFatura
 builder.Services.AddScoped<Core.ProcessadorFatura>(provider =>

@@ -1,6 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure;
 using System.Diagnostics;
+using System.Text;
+
+public enum TipoSaida
+{
+    OFX,
+    GoogleSpreadsheet
+}
 
 public class PdfController : Controller
 {
@@ -13,6 +20,7 @@ public class PdfController : Controller
 
     public IActionResult Index()
     {
+        ViewBag.TiposSaida = Enum.GetValues(typeof(TipoSaida));
         return View();
     }
 
@@ -24,10 +32,18 @@ public class PdfController : Controller
         return File(bytesArquivo, "application/ofx", "brbCard.ofx");
     }
 
-    [HttpPost]
-    public IActionResult Upload(IFormFile file)
+    [HttpGet]
+    public IActionResult DownloadGoogleSpreadsheet()
     {
-        var nomeArquivoOfx = String.Empty;
+        var caminhoArquivo = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", "brbCard.csv");
+        var bytesArquivo = System.IO.File.ReadAllBytes(caminhoArquivo);
+        return File(bytesArquivo, "text/csv", "brbCard.csv");
+    }
+
+    [HttpPost]
+    public IActionResult Upload(IFormFile file, TipoSaida tipoSaida)
+    {
+        var nomeArquivoSaida = String.Empty;
         if (file != null && file.Length > 0)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", file.FileName);
@@ -45,33 +61,44 @@ public class PdfController : Controller
 
             // Calcular o total das faturas
             decimal totalFatura = faturas.Sum(fatura => fatura.AMOUNT_VALUE);
-
-            // Calcular o total de créditos (valores positivos)
             decimal totalFaturaCredito = faturas.Where(fatura => fatura.AMOUNT_VALUE > 0).Sum(fatura => fatura.AMOUNT_VALUE);
-
-            // Calcular o total de débitos (valores negativos)
             decimal totalFaturaDebito = faturas.Where(fatura => fatura.AMOUNT_VALUE < 0).Sum(fatura => fatura.AMOUNT_VALUE);
 
             Debug.WriteLine($"Total Fatura: {totalFatura}");
-            Debug.WriteLine($"Total Fatura Crédito: {totalFaturaCredito}");
-            Debug.WriteLine($"Total Fatura Débito: {totalFaturaDebito}");
+            Debug.WriteLine($"Total Fatura CrÃ©dito: {totalFaturaCredito}");
+            Debug.WriteLine($"Total Fatura DÃ©bito: {totalFaturaDebito}");
 
-            // Armazenando valores para exibição
             ViewBag.TotalFatura = totalFatura;
             ViewBag.TotalFaturaCredito = totalFaturaCredito;
             ViewBag.TotalFaturaDebito = totalFaturaDebito;
             ViewBag.log = log;
 
-            //Gera o OFX baseado nas faturas
-            var ofxGenerator = new Core.OfxGenerator();
-            string conteudoOfx = ofxGenerator.GerarOfx(faturas, menorData, maiorData, totalFatura);
+            if (tipoSaida == TipoSaida.OFX)
+            {
+                var ofxGenerator = new Core.OfxGenerator();
+                string conteudoOfx = ofxGenerator.GerarOfx(faturas, menorData, maiorData, totalFatura);
+                nomeArquivoSaida = "brbCard.ofx";
+                var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoSaida);
+                System.IO.File.WriteAllText(caminhoArquivoSaida, conteudoOfx);
+            }
+            else
+            {
+                var csvBuilder = new StringBuilder();
+                // CabeÃ§alho do CSV
+                csvBuilder.AppendLine("TRNTYPE,DTPOSTED,DTPOSTED_ORIGINAL,TRNAMT,FITID,NAME,AMOUNT_VALUE,DATA");
+                
+                // Dados
+                foreach (var fatura in faturas)
+                {
+                    csvBuilder.AppendLine($"{fatura.TRNTYPE},{fatura.DTPOSTED},{fatura.DTPOSTED_ORIGINAL},{fatura.TRNAMT},{fatura.FITID},{fatura.NAME},{fatura.AMOUNT_VALUE.ToString(System.Globalization.CultureInfo.InvariantCulture)},{fatura.DATA:yyyy-MM-dd}");
+                }
 
-            //Faz o processamento no arquivo
-            nomeArquivoOfx = "brbCard.ofx";
-            var caminhoArquivoOfx = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoOfx);
-            System.IO.File.WriteAllText(caminhoArquivoOfx, conteudoOfx);
+                nomeArquivoSaida = "brbCard.csv";
+                var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoSaida);
+                System.IO.File.WriteAllText(caminhoArquivoSaida, csvBuilder.ToString());
+            }
         }
 
-        return View("DownloadOfx", nomeArquivoOfx);
+        return tipoSaida == TipoSaida.OFX ? View("DownloadOfx", nomeArquivoSaida) : View("DownloadGoogleSpreadsheet", nomeArquivoSaida);
     }
 }

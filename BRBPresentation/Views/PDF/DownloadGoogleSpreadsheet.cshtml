@@ -1,0 +1,13 @@
+@model string
+
+<h2>Download do Arquivo CSV</h2>
+
+<p>O arquivo CSV foi gerado com sucesso!</p>
+
+<div>
+    <a href="@Url.Action("DownloadGoogleSpreadsheet", "Pdf")" class="btn btn-primary">Download do Arquivo CSV</a>
+</div>
+
+<div>
+    <a href="@Url.Action("Index", "Pdf")" class="btn btn-secondary">Voltar</a>
+</div> 
