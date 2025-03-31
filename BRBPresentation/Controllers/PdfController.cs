@@ -115,6 +115,7 @@ public class PdfController : Controller
                     TotalFaturaCredito = totalFaturaCredito,
                     TotalFaturaDebito = totalFaturaDebito
                 };
+                ViewBag.NomeArquivo = file.FileName;
                 return View("Report", viewModel);
             }
         }

@@ -186,6 +186,33 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            const nomeArquivo = '@ViewBag.NomeArquivo';
+            const storageKey = `usuarioSelecoes_${nomeArquivo}`;
+
+            // Carregar seleções salvas
+            function carregarSelecoes() {
+                const selecoesSalvas = localStorage.getItem(storageKey);
+                if (selecoesSalvas) {
+                    const selecoes = JSON.parse(selecoesSalvas);
+                    $('.usuario-select').each(function() {
+                        const valor = $(this).data('valor').toString();
+                        if (selecoes[valor]) {
+                            $(this).val(selecoes[valor]);
+                        }
+                    });
+                    atualizarTotais();
+                }
+            }
+
+            function salvarSelecoes() {
+                const selecoes = {};
+                $('.usuario-select').each(function() {
+                    const valor = $(this).data('valor').toString();
+                    selecoes[valor] = $(this).val();
+                });
+                localStorage.setItem(storageKey, JSON.stringify(selecoes));
+            }
+
             function atualizarTotais() {
                 let totalFernando = 0;
                 let totalRoberta = 0;
@@ -211,8 +238,14 @@
                 $('#total-geral').text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGeral));
             }
 
-            atualizarTotais();
-            $('.usuario-select').on('change', atualizarTotais);
+            // Carregar seleções ao iniciar
+            carregarSelecoes();
+
+            // Salvar seleções quando mudar
+            $('.usuario-select').on('change', function() {
+                salvarSelecoes();
+                atualizarTotais();
+            });
         });
     </script>
 } 
