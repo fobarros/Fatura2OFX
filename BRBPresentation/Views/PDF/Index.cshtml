@@ -1,67 +1,73 @@
-@using (Html.BeginForm("Upload", "Pdf", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <div class="form-group">
-        <label for="file">Escolha um arquivo PDF:</label>
-        <input type="file" name="file" class="form-control" required />
-    </div>
-
-    <div class="form-group mt-3">
-        <label for="tipoSaida">Formato de Saída:</label>
-        <select name="tipoSaida" id="tipoSaida" class="form-control" required>
-            @foreach (var tipo in ViewBag.TiposSaida)
-            {
-                <option value="@tipo">@tipo</option>
-            }
-        </select>
-    </div>
-
-    <div class="form-group mt-3" id="debugContainer">
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="debugMode" name="debugMode" value="true">
-            <label class="form-check-label" for="debugMode">Modo Debug</label>
-        </div>
-    </div>
-
-    <div class="mt-3">
-        <input type="submit" value="Executar" class="btn btn-primary" />
-    </div>
+@{
+    ViewData["Title"] = "Upload de PDF";
 }
 
-<script>
-    function atualizarVisibilidadeDebug() {
-        var tipoSaida = document.getElementById('tipoSaida');
-        var debugContainer = document.getElementById('debugContainer');
-        var isTela = tipoSaida.value === 'Tela';
-        
-        // Salva a seleção atual no localStorage
-        localStorage.setItem('tipoSaidaSelecionado', tipoSaida.value);
-        
-        debugContainer.style.display = isTela ? 'block' : 'none';
-    }
+@section Styles {
+    <link rel="stylesheet" href="~/css/pdf.css" />
+}
 
-    // Restaura a seleção anterior do combo
-    function restaurarSelecao() {
-        var tipoSaida = document.getElementById('tipoSaida');
-        var tipoSelecionado = localStorage.getItem('tipoSaidaSelecionado');
-        
-        if (tipoSelecionado) {
-            tipoSaida.value = tipoSelecionado;
-        }
-        
-        atualizarVisibilidadeDebug();
-    }
+<div class="pdf-background"></div>
 
-    // Atualizar quando o combo mudar
-    document.getElementById('tipoSaida').addEventListener('change', atualizarVisibilidadeDebug);
-
-    // Restaurar estado quando a página carregar
-    window.addEventListener('load', restaurarSelecao);
+<div class="pdf-upload-container">
+    <h1 class="pdf-form-title">Upload de PDF</h1>
     
-    // Restaurar estado quando voltar no navegador
-    window.addEventListener('pageshow', function(event) {
-        restaurarSelecao();
-    });
+    @using (Html.BeginForm("Upload", "Pdf", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="form-group">
+            <label for="file" class="form-label">Escolha um arquivo PDF:</label>
+            <input type="file" name="file" class="form-control" accept=".pdf" required />
+        </div>
 
-    // Executar imediatamente para garantir o estado inicial
-    restaurarSelecao();
-</script>
+        <div class="form-group">
+            <label for="tipoSaida" class="form-label">Formato de Saída:</label>
+            <select name="tipoSaida" id="tipoSaida" class="form-control" required>
+                @foreach (var tipo in ViewBag.TiposSaida)
+                {
+                    <option value="@tipo">@tipo</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group" id="debugContainer">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="debugMode" name="debugMode" value="true">
+                <label class="form-check-label" for="debugMode">Modo Debug</label>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i>Executar
+            </button>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function atualizarVisibilidadeDebug() {
+            var tipoSaida = document.getElementById('tipoSaida');
+            var debugContainer = document.getElementById('debugContainer');
+            var isTela = tipoSaida.value === 'Tela';
+            
+            localStorage.setItem('tipoSaidaSelecionado', tipoSaida.value);
+            debugContainer.style.display = isTela ? 'block' : 'none';
+        }
+
+        function restaurarSelecao() {
+            var tipoSaida = document.getElementById('tipoSaida');
+            var tipoSelecionado = localStorage.getItem('tipoSaidaSelecionado');
+            
+            if (tipoSelecionado) {
+                tipoSaida.value = tipoSelecionado;
+            }
+            
+            atualizarVisibilidadeDebug();
+        }
+
+        document.getElementById('tipoSaida').addEventListener('change', atualizarVisibilidadeDebug);
+        window.addEventListener('load', restaurarSelecao);
+        window.addEventListener('pageshow', restaurarSelecao);
+        restaurarSelecao();
+    </script>
+}
