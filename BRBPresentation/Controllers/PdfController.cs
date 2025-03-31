@@ -3,6 +3,7 @@ using Infrastructure;
 using System.Diagnostics;
 using System.Text;
 using BRBPresentation.Models;
+using Core;
 
 public enum TipoSaida
 {
@@ -42,6 +43,18 @@ public class PdfController : Controller
         return File(bytesArquivo, "text/csv", "brbCard.csv");
     }
 
+    private (string nomeArquivo, string conteudoOfx) GerarArquivoOFX(List<Core.Fatura> faturas)
+    {
+        var menorData = faturas.Min(f => f.DATA);
+        var maiorData = faturas.Max(f => f.DATA);
+        var totalFatura = faturas.Sum(f => f.AMOUNT_VALUE);
+
+        var ofxGenerator = new Core.OfxGenerator();
+        string conteudoOfx = ofxGenerator.GerarOfx(faturas, menorData, maiorData, totalFatura);
+        
+        return ("brbCard.ofx", conteudoOfx);
+    }
+
     [HttpPost]
     public IActionResult Upload(IFormFile file, TipoSaida tipoSaida, bool debugMode = false)
     {
@@ -57,9 +70,6 @@ public class PdfController : Controller
 
             //realiza o processo de gerar faturas para cada linha do PDF
             var (faturas, log) = _pdfReaderService.ProcessarFaturasDoPdf(path);
-
-            var menorData = faturas.Min(fatura => fatura.DATA);
-            var maiorData = faturas.Max(fatura => fatura.DATA);
 
             // Calcular o total das faturas
             decimal totalFatura = faturas.Sum(fatura => fatura.AMOUNT_VALUE);
@@ -82,12 +92,10 @@ public class PdfController : Controller
 
             if (tipoSaida == TipoSaida.OFX)
             {
-                var ofxGenerator = new Core.OfxGenerator();
-                string conteudoOfx = ofxGenerator.GerarOfx(faturas, menorData, maiorData, totalFatura);
-                nomeArquivoSaida = "brbCard.ofx";
-                var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivoSaida);
+                var (nomeArquivo, conteudoOfx) = GerarArquivoOFX(faturas);
+                var caminhoArquivoSaida = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivo);
                 System.IO.File.WriteAllText(caminhoArquivoSaida, conteudoOfx);
-                return View("DownloadOfx", nomeArquivoSaida);
+                return View("DownloadOfx", nomeArquivo);
             }
             else if (tipoSaida == TipoSaida.GoogleSpreadsheet)
             {
@@ -121,5 +129,53 @@ public class PdfController : Controller
         }
 
         return View("Index");
+    }
+
+    [HttpPost]
+    public IActionResult GerarOFXParaFernando([FromBody] List<FaturaRequest> faturasData)
+    {
+        try
+        {
+            if (faturasData == null || !faturasData.Any())
+            {
+                return Json(new { success = false, message = "Nenhuma fatura selecionada para o Fernando" });
+            }
+
+            var faturas = faturasData.Select(f => new Core.Fatura(
+                f.TrnType,
+                f.Amount,
+                f.Name,
+                f.DatePosted,
+                f.DataOriginal,
+                f.Usuario,
+                f.CartaoCredito
+            )).ToList();
+
+            // Atualizar o FITID das faturas com os valores originais
+            for (int i = 0; i < faturas.Count; i++)
+            {
+                faturas[i].FITID = faturasData[i].Fitid;
+            }
+
+            var (nomeArquivo, conteudoOfx) = GerarArquivoOFX(faturas);
+            nomeArquivo = "brbCard_fernando.ofx";
+            
+            var caminhoArquivo = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", nomeArquivo);
+            System.IO.File.WriteAllText(caminhoArquivo, conteudoOfx);
+
+            // Verificar se o arquivo foi criado
+            if (!System.IO.File.Exists(caminhoArquivo))
+            {
+                return Json(new { success = false, message = "Erro ao criar arquivo OFX" });
+            }
+
+            // Retornar o arquivo diretamente
+            var bytes = System.IO.File.ReadAllBytes(caminhoArquivo);
+            return File(bytes, "application/x-ofx", nomeArquivo);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 }

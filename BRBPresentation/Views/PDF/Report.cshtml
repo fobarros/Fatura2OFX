@@ -80,7 +80,15 @@
                                         <td>@fatura.NAME</td>
                                         <td>@(fatura.CartaoCredito.Length > 4 ? fatura.CartaoCredito.Substring(fatura.CartaoCredito.Length - 4) : fatura.CartaoCredito)</td>
                                         <td>
-                                            <select class="form-control form-control-sm usuario-select" data-valor="@fatura.AMOUNT_VALUE">
+                                            <select class="form-control form-control-sm usuario-select" 
+                                                    data-valor="@fatura.AMOUNT_VALUE"
+                                                    data-fitid="@fatura.FITID"
+                                                    data-trn-type="@fatura.TRNTYPE"
+                                                    data-amount="@fatura.AMOUNT_VALUE"
+                                                    data-name="@fatura.NAME"
+                                                    data-date-posted="@fatura.DATA.ToString("yyyy-MM-dd")"
+                                                    data-data-original="@fatura.DTPOSTED_ORIGINAL"
+                                                    data-cartao="@fatura.CartaoCredito">
                                                 <option value="FERNANDO O BARROS" selected="@(fatura.Usuario == "FERNANDO O BARROS")">Fernando</option>
                                                 <option value="ROBERTA BARROS" selected="@(fatura.Usuario == "ROBERTA BARROS")">Roberta</option>
                                             </select>
@@ -181,6 +189,17 @@
             </div>
         </div>
     </div>
+    <div class="row mx-0 mt-3">
+        <div class="col-12">
+            <div class="card shadow-sm rounded">
+                <div class="card-body text-center">
+                    <button id="btnGerarOFX" class="btn btn-primary">
+                        <i class="fas fa-file-export me-2"></i>Gerar OFX para Fernando
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -245,6 +264,102 @@
             $('.usuario-select').on('change', function() {
                 salvarSelecoes();
                 atualizarTotais();
+            });
+
+            // Adicionar handler para o botão de gerar OFX
+            $('#btnGerarOFX').on('click', function() {
+                const faturasFernando = [];
+                
+                $('.usuario-select').each(function() {
+                    if ($(this).val() === 'FERNANDO O BARROS') {
+                        // Converter o amount para formato americano e garantir que seja positivo
+                        const amountStr = $(this).data('amount').toString().replace(',', '.');
+                        const amount = Math.abs(parseFloat(amountStr));
+                        
+                        const fatura = {
+                            trnType: $(this).data('trn-type'),
+                            amount: amount,
+                            name: $(this).data('name'),
+                            datePosted: $(this).data('date-posted'),
+                            dataOriginal: $(this).data('data-original'),
+                            usuario: "FERNANDO O BARROS",
+                            fitid: $(this).data('fitid')
+                        };
+                        
+                        faturasFernando.push(fatura);
+                    }
+                });
+
+                if (faturasFernando.length === 0) {
+                    alert('Nenhuma fatura selecionada para o Fernando');
+                    return;
+                }
+
+                //console.log('Dados a serem enviados:', JSON.stringify(faturasFernando, null, 2));
+
+                // Fazer requisição para gerar o OFX usando fetch
+                fetch('/Pdf/GerarOFXParaFernando', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(faturasFernando)
+                })
+                .then(response => {
+                    //console.log('Status da resposta:', response.status);
+                    //console.log('Headers da resposta:', Object.fromEntries(response.headers.entries()));
+                    
+                    if (!response.ok) {
+                        //console.log('Resposta não ok, tentando ler texto...');
+                        return response.text().then(text => {
+                            //console.log('Texto da resposta de erro:', text);
+                            try {
+                                const errorResponse = JSON.parse(text);
+                                //console.log('Erro parseado:', errorResponse);
+                                throw new Error(errorResponse.message);
+                            } catch (e) {
+                                //console.log('Erro ao fazer parse do JSON:', e);
+                                throw new Error('Erro ao processar resposta do servidor');
+                            }
+                        });
+                    }
+                    
+                    const contentType = response.headers.get('content-type');
+                    //console.log('Content-Type da resposta:', contentType);
+                    
+                    if (contentType && contentType.includes('application/x-ofx')) {
+                        //console.log('Resposta é um arquivo OFX, processando...');
+                        return response.blob().then(blob => {
+                            //console.log('Blob recebido:', blob);
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'brbCard_fernando.ofx';
+                            document.body.appendChild(link);
+                            link.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(link);
+                        });
+                    } else {
+                        //console.log('Resposta não é OFX, tentando ler texto...');
+                        return response.text().then(text => {
+                            //console.log('Texto da resposta:', text);
+                            try {
+                                const errorResponse = JSON.parse(text);
+                                //console.log('Erro parseado:', errorResponse);
+                                throw new Error(errorResponse.message);
+                            } catch (e) {
+                                //console.log('Erro ao fazer parse do JSON:', e);
+                                throw new Error('Erro ao processar resposta do servidor');
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro completo:', error);
+                    console.error('Stack trace:', error.stack);
+                    alert(error.message);
+                });
             });
         });
     </script>
