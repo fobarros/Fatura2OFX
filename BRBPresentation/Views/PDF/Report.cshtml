@@ -35,6 +35,14 @@
     .table-light-striped tbody tr:nth-of-type(even) {
         background-color: #ffffff;
     }
+
+    .cartao-break {
+        border-top: 2px solid #dee2e6;
+    }
+
+    .cartao-break td {
+        padding-top: 1rem;
+    }
 </style>
 
 <div class="container-fluid p-0">
@@ -73,9 +81,14 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @{
+                                    string cartaoAnterior = "";
+                                }
                                 @foreach (var fatura in Model.Faturas)
                                 {
-                                    <tr>
+                                    var isCartaoBreak = cartaoAnterior != "" && cartaoAnterior != fatura.CartaoCredito;
+                                    cartaoAnterior = fatura.CartaoCredito;
+                                    <tr class="@(isCartaoBreak ? "cartao-break" : "")">
                                         <td>@fatura.DTPOSTED_ORIGINAL</td>
                                         <td>@fatura.NAME</td>
                                         <td>@(fatura.CartaoCredito.Length > 4 ? fatura.CartaoCredito.Substring(fatura.CartaoCredito.Length - 4) : fatura.CartaoCredito)</td>
