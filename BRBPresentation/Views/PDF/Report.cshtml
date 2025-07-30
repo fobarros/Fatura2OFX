@@ -146,11 +146,23 @@
                             </thead>
                             <tbody>
                                 @{
+                                    string FormatarNomeUsuario(string nomeCompleto)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(nomeCompleto))
+                                            return "";
+                                        
+                                        var firstName = nomeCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                                        if (string.IsNullOrEmpty(firstName) || firstName.Length == 0)
+                                            return "";
+                                        
+                                        return firstName.Substring(0, 1).ToUpper() + (firstName.Length > 1 ? firstName.Substring(1).ToLower() : "");
+                                    }
+                                    
                                     var totaisPorCartao = Model.Faturas
                                         .GroupBy(f => new { f.CartaoCredito, f.Usuario })
                                         .Select(g => new {
                                             Cartao = g.Key.CartaoCredito,
-                                            Usuario = g.Key.Usuario.Split(' ')[0].Substring(0, 1) + g.Key.Usuario.Split(' ')[0].Substring(1).ToLower(),
+                                            Usuario = FormatarNomeUsuario(g.Key.Usuario),
                                             Total = g.Sum(f => f.AMOUNT_VALUE)
                                         })
                                         .OrderBy(x => x.Cartao)
@@ -376,4 +388,4 @@
             });
         });
     </script>
-} 
+}
