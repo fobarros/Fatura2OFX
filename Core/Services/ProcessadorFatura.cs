@@ -177,7 +177,7 @@ namespace Core
         private bool LinhaValidaParaFatura(string linha)
         {
             // Ignora linhas que contêm "Obrigado pelo pagamento"
-            if (linha.Contains("Obrigado pelo pagamento"))
+            if (linha.Contains("Obrigado pelo pagamento") || linha.Contains("Estorno de pagamento"))
                 return false;
 
             // Regex que corresponde a linhas com data, texto opcional, e valor monetário (com ou sem separador de milhar)
