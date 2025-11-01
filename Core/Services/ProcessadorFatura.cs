@@ -237,7 +237,7 @@ namespace Core
                     //Debug.WriteLine($"Fatura processada: Data: {data.ToShortDateString()}, Tipo: {trnType}, Valor: {valor}, Descrição: {descricao}, Usuário: {_usuarioAtual}, Cartão: {_cartaoAtual}");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Debug.WriteLine($"Erro ao processar a linha '{linha}': {ex.Message} - linha do código: {ex.StackTrace}");
             }
