@@ -19,6 +19,11 @@
         </div>
 
         <div class="form-group">
+            <label for="dataInicioFatura" class="form-label">Data Inicial da Fatura:</label>
+            <input type="date" name="dataInicioFatura" id="dataInicioFatura" class="form-control" required />
+        </div>
+
+        <div class="form-group">
             <label for="tipoSaida" class="form-label">Formato de Saída:</label>
             <select name="tipoSaida" id="tipoSaida" class="form-control" required>
                 @foreach (var tipo in ViewBag.TiposSaida)
@@ -45,6 +50,27 @@
 
 @section Scripts {
     <script>
+        function calcularDataInicialDefault() {
+            var hoje = new Date();
+            var dia = hoje.getDate();
+            var dataInicial;
+            
+            if (dia > 15) {
+                // Se o dia de hoje for > 15, assume dia 1 do mesmo mês/ano
+                dataInicial = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            } else {
+                // Se o dia de hoje for <= 15, assume dia 1 do mês anterior
+                dataInicial = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+            }
+            
+            // Formatar como YYYY-MM-DD para o input type="date"
+            var ano = dataInicial.getFullYear();
+            var mes = String(dataInicial.getMonth() + 1).padStart(2, '0');
+            var diaData = String(dataInicial.getDate()).padStart(2, '0');
+            
+            return ano + '-' + mes + '-' + diaData;
+        }
+
         function atualizarVisibilidadeDebug() {
             var tipoSaida = document.getElementById('tipoSaida');
             var debugContainer = document.getElementById('debugContainer');
@@ -65,9 +91,21 @@
             atualizarVisibilidadeDebug();
         }
 
+        function inicializarDataInicial() {
+            var dataInicioFatura = document.getElementById('dataInicioFatura');
+            if (!dataInicioFatura.value) {
+                dataInicioFatura.value = calcularDataInicialDefault();
+            }
+        }
+
         document.getElementById('tipoSaida').addEventListener('change', atualizarVisibilidadeDebug);
-        window.addEventListener('load', restaurarSelecao);
-        window.addEventListener('pageshow', restaurarSelecao);
-        restaurarSelecao();
+        window.addEventListener('load', function() {
+            restaurarSelecao();
+            inicializarDataInicial();
+        });
+        window.addEventListener('pageshow', function() {
+            restaurarSelecao();
+            inicializarDataInicial();
+        });
     </script>
 }

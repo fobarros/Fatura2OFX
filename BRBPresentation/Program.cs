@@ -12,14 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-// Parse DataInicioFatura from appsettings.json
-var dataInicioConfig = builder.Configuration["DataInicioFatura"];
-DateTime dataInicioFatura;
-if (!DateTime.TryParseExact(dataInicioConfig, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataInicioFatura))
-{
-    throw new InvalidOperationException("DataInicioFatura no appsettings.json está em um formato inválido ou ausente.");
-}
-
 var pulaLinhaConfig = builder.Configuration["PulaLinha"];
 bool pulaLinha;
 if (!bool.TryParse(pulaLinhaConfig, out pulaLinha))
@@ -38,11 +30,10 @@ builder.WebHost.ConfigureKestrel(options =>
     options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
 });
 
-// Configure ProcessadorFatura to include DataInicioFatura
+// Configure ProcessadorFatura
 builder.Services.AddScoped<Core.ProcessadorFatura>(provider =>
     new Core.ProcessadorFatura(
         provider.GetRequiredService<Core.IExclusaoFaturaService>(),
-        dataInicioFatura,
         pulaLinha));
 
 builder.Services.AddScoped<Infrastructure.PdfReaderService>(); 

@@ -8,15 +8,13 @@ namespace Core
     public class ProcessadorFatura
     {
         private readonly IExclusaoFaturaService _exclusaoFaturaService;
-        private readonly DateTime _dataInicioFatura;
         private readonly Boolean _pulaLinha;
         private string _usuarioAtual = "";
         private string _cartaoAtual = "";
 
-        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, DateTime dataInicioFatura, Boolean pulaLinha)
+        public ProcessadorFatura(IExclusaoFaturaService exclusaoFaturaService, Boolean pulaLinha)
         {
             _exclusaoFaturaService = exclusaoFaturaService;
-            _dataInicioFatura = dataInicioFatura;
             _pulaLinha = pulaLinha;
         }
 
@@ -91,7 +89,7 @@ namespace Core
             return (faturas, log.ToString());
         }
 
-        public (List<Fatura>, string) ProcessarTextoPdf(string texto)
+        public (List<Fatura>, string) ProcessarTextoPdf(string texto, DateTime dataInicioFatura)
         {
             var faturas = new List<Fatura>();
             var linhas = texto.Split('\n'); // Divide o texto em linhas
@@ -151,7 +149,7 @@ namespace Core
                 if (LinhaValidaParaFatura(linha))
                 {
                     log.AppendLine($"Processando linha de fatura: {linha}");
-                    var faturasExtraidas = ExtrairFaturaDaLinha(linha);
+                    var faturasExtraidas = ExtrairFaturaDaLinha(linha, dataInicioFatura);
                     faturas.AddRange(faturasExtraidas);
                 }
             }
@@ -189,7 +187,7 @@ namespace Core
             return linhaRegex;
         }
 
-        private List<Fatura> ExtrairFaturaDaLinha(string linha)
+        private List<Fatura> ExtrairFaturaDaLinha(string linha, DateTime dataInicioFatura)
         {
             var faturas = new List<Fatura>();
 
@@ -206,17 +204,17 @@ namespace Core
                     var data = DateTime.ParseExact(dataString, "dd/MM", CultureInfo.InvariantCulture);
                     
                     // Ajusta o ano da data para corresponder ao ano da dataInicioFatura
-                    data = new DateTime(_dataInicioFatura.Year, data.Month, data.Day);
+                    data = new DateTime(dataInicioFatura.Year, data.Month, data.Day);
 
                     // Se for o mesmo mês/ano, mantém a data original
-                    if (data.Month == _dataInicioFatura.Month && data.Year == _dataInicioFatura.Year)
+                    if (data.Month == dataInicioFatura.Month && data.Year == dataInicioFatura.Year)
                     {
                         // Mantém a data original
                     }
                     // Se não for o mesmo mês/ano, ajusta para dataInicioFatura
                     else
                     {
-                        data = _dataInicioFatura;
+                        data = dataInicioFatura;
                     }
 
                     // Encontrar o índice do próximo valor monetário após a data

@@ -18,11 +18,11 @@ namespace Infrastructure
             _linhasProcessadas = new HashSet<string>();
         }
 
-        public (List<Fatura>, string) ProcessarFaturasDoPdf(string caminhoPdf)
+        public (List<Fatura>, string) ProcessarFaturasDoPdf(string caminhoPdf, DateTime dataInicioFatura)
         {
             _linhasProcessadas.Clear(); // Limpa o cache de linhas a cada novo processamento
             string textoExtraido = ExtrairTextoDoPdf(caminhoPdf);
-            var (faturas, log) = _processadorFatura.ProcessarTextoPdf(textoExtraido);
+            var (faturas, log) = _processadorFatura.ProcessarTextoPdf(textoExtraido, dataInicioFatura);
             return (faturas, log);
         }
 

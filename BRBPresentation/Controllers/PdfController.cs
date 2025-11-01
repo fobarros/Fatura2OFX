@@ -56,11 +56,19 @@ public class PdfController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upload(IFormFile file, TipoSaida tipoSaida, bool debugMode = false)
+    public IActionResult Upload(IFormFile file, string dataInicioFatura, TipoSaida tipoSaida, bool debugMode = false)
     {
         var nomeArquivoSaida = String.Empty;
         if (file != null && file.Length > 0)
         {
+            // Parse da data recebida do formulário (formato YYYY-MM-DD)
+            if (string.IsNullOrEmpty(dataInicioFatura) || !DateTime.TryParse(dataInicioFatura, out DateTime dataInicio))
+            {
+                ViewBag.ErrorMessage = "Data inicial inválida. Por favor, informe uma data válida.";
+                ViewBag.TiposSaida = Enum.GetValues(typeof(TipoSaida));
+                return View("Index");
+            }
+
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", file.FileName);
 
             using (var stream = new FileStream(path, FileMode.Create))
@@ -69,7 +77,7 @@ public class PdfController : Controller
             }
 
             //realiza o processo de gerar faturas para cada linha do PDF
-            var (faturas, log) = _pdfReaderService.ProcessarFaturasDoPdf(path);
+            var (faturas, log) = _pdfReaderService.ProcessarFaturasDoPdf(path, dataInicio);
 
             // Calcular o total das faturas
             decimal totalFatura = faturas.Sum(fatura => fatura.AMOUNT_VALUE);
