@@ -23,7 +23,7 @@ namespace BRBPresentation.Models
         public required string Usuario { get; set; }
 
         [JsonPropertyName("cartaoCredito")]
-        public required string CartaoCredito { get; set; }
+        public string CartaoCredito { get; set; } = string.Empty;
 
         [JsonPropertyName("fitid")]
         public required string Fitid { get; set; }
