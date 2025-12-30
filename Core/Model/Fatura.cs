@@ -18,7 +18,7 @@ namespace Core
         public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal, string usuario = "FERNANDO O BARROS", string cartaoCredito = "")
         {
             TRNTYPE = trnType;
-            NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "");
+            NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "").Replace("&", "");
             NAME = string.IsNullOrWhiteSpace(NAME) ? "Anuidade" : (NAME.Length > 30 ? NAME[..30] : NAME);
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
