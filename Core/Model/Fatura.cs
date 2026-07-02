@@ -10,6 +10,7 @@ namespace Core
         public string TRNAMT { get; set; }
         public string FITID { get; set; }
         public string NAME { get; set; }
+        public string MEMO { get; set; }
         public decimal AMOUNT_VALUE { get; set; }
         public DateTime DATA { get; set; }
         public string Usuario { get; set; }
@@ -18,7 +19,15 @@ namespace Core
         public Fatura(string trnType, decimal amount, string name, DateTime datePosted, string dataOriginal, string usuario = "FERNANDO O BARROS", string cartaoCredito = "")
         {
             TRNTYPE = trnType;
-            NAME = name.Replace(",", ".").Replace("$", "").Replace("/", "").Replace("\\", "").Replace("%", "").Replace("&", "");
+
+            // Normalização de marketplaces (ponto único). Se a descrição casar com um
+            // prefixo conhecido (ex.: "MERCADO*", "SHOPE *"), o recebedor vira o nome
+            // amigável e o texto após o "*" vai para o MEMO. Caso contrário, tudo
+            // segue com o comportamento original.
+            MarketplaceNormalizer.TryNormalizar(name, out var nomeRecebedor, out var memo);
+            MEMO = LimparCampo(memo);
+
+            NAME = LimparCampo(nomeRecebedor);
             NAME = string.IsNullOrWhiteSpace(NAME) ? "Anuidade" : (NAME.Length > 30 ? NAME[..30] : NAME);
             AMOUNT_VALUE = trnType == "DEBIT" ? -amount : amount;
             DATA = datePosted;
@@ -35,6 +44,12 @@ namespace Core
 
             // Gerar FITID
             FITID = GenerateFITID(datePosted, name, amount);
+        }
+
+        private static string LimparCampo(string valor)
+        {
+            return (valor ?? "").Replace(",", ".").Replace("$", "").Replace("/", "")
+                                .Replace("\\", "").Replace("%", "").Replace("&", "");
         }
 
         private string GenerateFITID(DateTime datePosted, string name, decimal valor)

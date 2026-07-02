@@ -59,6 +59,8 @@ namespace Core{
                 sb.AppendLine($"                        <TRNAMT>{fatura.TRNAMT}</TRNAMT>");
                 sb.AppendLine($"                        <FITID>{fatura.FITID}</FITID>");
                 sb.AppendLine($"                        <NAME>{fatura.NAME}</NAME>");
+                if (!string.IsNullOrWhiteSpace(fatura.MEMO))
+                    sb.AppendLine($"                        <MEMO>{fatura.MEMO}</MEMO>");
                 sb.AppendLine("                    </STMTTRN>");
             }
             sb.AppendLine("                </BANKTRANLIST>");
