@@ -30,6 +30,7 @@ namespace Core
                 ["SHOPE"] = "SHOPEE",
                 ["UPS"] = "UPS",
                 ["99FOD"] = "iFood",
+                ["IFD"] = "iFood",
             };
 
         // Descrição começa com (case-insensitive) -> nome amigável.
@@ -39,6 +40,7 @@ namespace Core
             ("DROGARIA_SP", "DROGARIA_SP"),
             ("DROGARIASP", "DROGARIA_SP"),
             ("10 CARTOES", "Zona Azul"),
+            ("PAGUE MENOS", "PAGUE MENOS"),
         };
 
         /// <summary>
