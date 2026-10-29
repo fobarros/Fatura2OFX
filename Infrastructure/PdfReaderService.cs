@@ -10,17 +10,14 @@ namespace Infrastructure
     public class PdfReaderService
     {
         private readonly ProcessadorFatura _processadorFatura;
-        private HashSet<string> _linhasProcessadas;
 
         public PdfReaderService(ProcessadorFatura processadorFatura)
         {
             _processadorFatura = processadorFatura;
-            _linhasProcessadas = new HashSet<string>();
         }
 
         public (List<Fatura>, string) ProcessarFaturasDoPdf(string caminhoPdf, DateTime dataInicioFatura)
         {
-            _linhasProcessadas.Clear(); // Limpa o cache de linhas a cada novo processamento
             string textoExtraido = ExtrairTextoDoPdf(caminhoPdf);
             var (faturas, log) = _processadorFatura.ProcessarTextoPdf(textoExtraido, dataInicioFatura);
             return (faturas, log);
@@ -81,24 +78,22 @@ namespace Infrastructure
             using (PdfDocument pdfDoc = new PdfDocument(reader))
             {
                 var texto = new StringBuilder();
-                var strategy = new SimpleTextExtractionStrategy();
 
                 for (int i = 2; i <= pdfDoc.GetNumberOfPages(); i++)
                 {
                     var pagina = pdfDoc.GetPage(i);
+                    // Estratégia nova por página: a mesma instância acumula o texto
+                    // das páginas anteriores e faria o extrato repetir lançamentos.
+                    var strategy = new SimpleTextExtractionStrategy();
                     string conteudoPagina = PdfTextExtractor.GetTextFromPage(pagina, strategy);
-                    
+
                     var linhas = conteudoPagina.Split('\n')
                         .Where(l => !string.IsNullOrWhiteSpace(l))
                         .Select(l => l.Trim())
-                        .Select(l => CorrigirLinha(l))
-                        .Where(l => !_linhasProcessadas.Contains(l)); // Remove linhas duplicadas
+                        .Select(l => CorrigirLinha(l));
 
                     foreach (var linha in linhas)
-                    {
-                        _linhasProcessadas.Add(linha); // Adiciona a linha ao cache
                         texto.AppendLine(linha);
-                    }
                 }
 
                 return texto.ToString();

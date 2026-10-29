@@ -168,8 +168,30 @@ namespace Core
 
             var (_faturas, limpezaLog) = LimpaFaturadeOutros(faturas);
             log.Append(limpezaLog);
+            DistinguirLancamentosRepetidos(_faturas);
 
             return (_faturas, log.ToString());
+        }
+
+        // Compras iguais (mesma data, valor e descrição) são lançamentos distintos.
+        // A primeira ocorrência mantém o FITID de sempre; as seguintes recebem um
+        // FITID próprio, na ordem em que aparecem na fatura.
+        private static void DistinguirLancamentosRepetidos(List<Fatura> faturas)
+        {
+            var ocorrencias = new Dictionary<string, int>();
+            foreach (var fatura in faturas)
+            {
+                var chave = fatura.FITID;
+                ocorrencias.TryGetValue(chave, out var n);
+                n++;
+                ocorrencias[chave] = n;
+                if (n == 1)
+                    continue;
+
+                using var md5 = System.Security.Cryptography.MD5.Create();
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes($"{chave}#{n}"));
+                fatura.FITID = new Guid(hash).ToString();
+            }
         }
 
         private bool LinhaValidaParaFatura(string linha)
