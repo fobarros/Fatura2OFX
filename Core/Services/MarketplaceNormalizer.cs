@@ -33,7 +33,12 @@ namespace Core
                 ["IFD"] = "iFood",
                 ["UBER"] = "Uber",
                 ["LATAM AIR"] = "Latam",
-                ["KETA"] = "Keta",
+                ["KETA"] = "Keeta",
+                ["KETABR"] = "Keeta",
+                ["KE"] = "Keeta",
+                ["PETLOVE SAUD"] = "PETLOVE",
+                ["EVO"] = "Beezy Pet",
+                ["AMAZONMKTPLC"] = "Amazon",
             };
 
         // Descrição começa com (case-insensitive) -> nome amigável.
@@ -45,6 +50,7 @@ namespace Core
             ("10 CARTOES", "Zona Azul"),
             ("PAGUE MENOS", "PAGUE MENOS"),
             ("SIXT", "Sixt"),
+            ("MICROSOFT", "Microsoft"),
         };
 
         /// <summary>
